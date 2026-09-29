@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: techy-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: techy
+      POSTGRES_USER: techy_user
+      POSTGRES_PASSWORD: techy_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - techy-pgdata:/var/lib/postgresql/data
+
+volumes:
+  techy-pgdata:
