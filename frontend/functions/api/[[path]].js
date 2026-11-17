@@ -18,7 +18,12 @@ const HOP_BY_HOP = ['host', 'connection', 'keep-alive', 'transfer-encoding', 'up
 
 export async function onRequest({ request, env }) {
   if (!env.BACKEND_URL) {
-    return Response.json({ error: 'The API is not configured (BACKEND_URL is missing).' }, { status: 503 })
+    // List variable NAMES only (never values) to make dashboard typos easy to spot.
+    const visible = Object.keys(env || {}).filter((k) => k !== 'ASSETS').map((k) => JSON.stringify(k)).join(', ') || 'none'
+    return Response.json({
+      error: 'The API is not configured (BACKEND_URL is missing).',
+      variablesVisibleToFunction: visible,
+    }, { status: 503 })
   }
 
   const incoming = new URL(request.url)
