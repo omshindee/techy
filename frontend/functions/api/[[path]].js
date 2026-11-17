@@ -16,7 +16,10 @@ const HOP_BY_HOP = ['host', 'connection', 'keep-alive', 'transfer-encoding', 'up
   // adds no Access-Control-Allow-Origin header, so other websites still can't read API responses.
   'origin']
 
-export async function onRequest({ request, env }) {
+export async function onRequest({ request, env: rawEnv }) {
+  // Dashboard values are easy to paste with a stray tab/space (in the name or the value): trim both.
+  const env = {}
+  for (const [k, v] of Object.entries(rawEnv || {})) env[k.trim()] = typeof v === 'string' ? v.trim() : v
   if (!env.BACKEND_URL) {
     // List variable NAMES only (never values) to make dashboard typos easy to spot.
     const visible = Object.keys(env || {}).filter((k) => k !== 'ASSETS').map((k) => JSON.stringify(k)).join(', ') || 'none'
