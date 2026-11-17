@@ -1,22 +1,19 @@
-# Java / Spring Boot
+# Backend
 backend/target/
-backend/.mvn/
-backend/HELP.md
+backend/uploads/
+uploads/
 *.class
-
-# Node / React
+*.log
+# Frontend
 frontend/node_modules/
 frontend/dist/
-frontend/.env
-
-# IDE
+# Env + IDE
+.env
 .idea/
 .vscode/
 *.iml
-
-# OS
 .DS_Store
-Thumbs.db
 
-# Docker
-*.env
+# Cloudflare local dev
+frontend/.wrangler/
+frontend/.dev.vars
