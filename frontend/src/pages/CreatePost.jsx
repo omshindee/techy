@@ -5,7 +5,7 @@ import { tagFor } from '../components/PostCard.jsx'
 import { CloseIcon, PhotoIcon } from '../components/Icons.jsx'
 import { api } from '../services/api.js'
 import { useAuth } from '../context/AuthContext.jsx'
-import { CATEGORIES, colorFor } from '../utils/categories.js'
+import { CATEGORIES, MAX_CATEGORIES_PER_POST, colorFor } from '../utils/categories.js'
 import { ACCEPTED_TYPES, preparePostImage } from '../utils/image.js'
 
 const MAX = 2000
@@ -19,7 +19,7 @@ export default function CreatePost() {
   const [preparing, setPreparing] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [content, setContent] = useState('')
-  const [category, setCategory] = useState(user.interests?.[0] || '')
+  const [categories, setCategories] = useState(user.interests?.[0] ? [user.interests[0]] : [])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -43,12 +43,12 @@ export default function CreatePost() {
 
   async function submit(e) {
     e.preventDefault()
-    if (!category) return setError('Pick a channel so the right people see your post.')
+    if (categories.length === 0) return setError('Pick at least one channel so the right people see your post.')
     if (!image && !content.trim()) return setError('Write something or attach a photo.')
     setBusy(true)
     setError('')
     try {
-      await api.createPost(content, category, image)
+      await api.createPost(content, categories, image)
       navigate(`/profile/${user.username}`)
     } catch (err) {
       setError(err.message)
@@ -56,7 +56,13 @@ export default function CreatePost() {
     }
   }
 
-  const canPost = !busy && !preparing && (image || content.trim()) && category
+  const canPost = !busy && !preparing && (image || content.trim()) && categories.length > 0
+  const full = categories.length >= MAX_CATEGORIES_PER_POST
+  const toggleCategory = (c) => {
+    setError('')
+    setCategories((prev) => prev.includes(c) ? prev.filter((x) => x !== c)
+      : prev.length >= MAX_CATEGORIES_PER_POST ? prev : [...prev, c])
+  }
 
   return (
     <div className="narrow">
@@ -84,14 +90,18 @@ export default function CreatePost() {
         {dragging && <div className="drop-hint" aria-hidden="true">Drop the image to attach it</div>}
 
         <fieldset className="composer-channels">
-          <legend>Channel</legend>
+          <legend>Channels <span className="muted small">· pick up to {MAX_CATEGORIES_PER_POST} ({categories.length}/{MAX_CATEGORIES_PER_POST})</span></legend>
           <div className="tag-picker">
-            {CATEGORIES.map((c) => (
-              <button type="button" key={c} onClick={() => setCategory(c)} aria-pressed={category === c}
-                className={category === c ? 'tag on' : 'tag'} style={{ '--cat': colorFor(c) }} title={c}>
-                {tagFor(c)}
-              </button>
-            ))}
+            {CATEGORIES.map((c) => {
+              const on = categories.includes(c)
+              return (
+                <button type="button" key={c} onClick={() => toggleCategory(c)} aria-pressed={on}
+                  disabled={!on && full} className={on ? 'tag on' : 'tag'} style={{ '--cat': colorFor(c) }}
+                  title={!on && full ? `You can pick up to ${MAX_CATEGORIES_PER_POST}` : c}>
+                  {tagFor(c)}
+                </button>
+              )
+            })}
           </div>
         </fieldset>
 

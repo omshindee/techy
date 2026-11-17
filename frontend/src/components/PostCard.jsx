@@ -7,7 +7,7 @@ import ReportDialog from './ReportDialog.jsx'
 import { CommentIcon, HeartIcon, MoreIcon } from './Icons.jsx'
 import { api, mediaUrl } from '../services/api.js'
 import { useAuth } from '../context/AuthContext.jsx'
-import { colorFor } from '../utils/categories.js'
+import { colorFor, categoriesOf } from '../utils/categories.js'
 import { count, timeAgo } from '../utils/format.js'
 
 const LONG_TEXT = 480 // characters before "Show more"
@@ -33,7 +33,8 @@ export default function PostCard({ post: initial, onDelete, onChange, onAuthorBl
   const [zoom, setZoom] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [showComments, setShowComments] = useState(startWithComments)
-  const color = colorFor(post.category)
+  const cats = categoriesOf(post)
+  const color = colorFor(cats[0])
   const own = user.id === post.author.id
 
   const first = useRef(true)
@@ -99,9 +100,13 @@ export default function PostCard({ post: initial, onDelete, onChange, onAuthorBl
           <span className="handle">@{post.author.username}</span>
           <time dateTime={post.createdAt} title={new Date(post.createdAt).toLocaleString()}>{timeAgo(post.createdAt)}</time>
         </div>
-        <Link to={`/?c=${encodeURIComponent(post.category)}`} className="tag" title={`More ${post.category} posts`}>
-          {tagFor(post.category)}
-        </Link>
+        <span className="post-tags">
+          {cats.map((c) => (
+            <Link key={c} to={`/?c=${encodeURIComponent(c)}`} className="tag" style={{ '--cat': colorFor(c) }} title={`More ${c} posts`}>
+              {tagFor(c)}
+            </Link>
+          ))}
+        </span>
         <button className="icon-button" onClick={() => setMenu(true)} aria-label="Post options"><MoreIcon size={20} /></button>
       </header>
 

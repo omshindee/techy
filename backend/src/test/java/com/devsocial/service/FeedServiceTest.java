@@ -13,7 +13,7 @@ class FeedServiceTest {
     private static final Instant NOW = Instant.parse("2026-01-01T12:00:00Z");
 
     private PostResponse post(Duration age, long likes, long comments) {
-        return new PostResponse(1L, "c", "Java", null, NOW.minus(age),
+        return new PostResponse(1L, "c", "Java", java.util.List.of("Java"), null, NOW.minus(age),
                 new PostResponse.Author(1L, "u", "u", null), likes, comments, false);
     }
 

@@ -44,7 +44,7 @@ public class FeedService {
         Instant now = Instant.now();
         return postService.toResponses(candidates, viewer).stream()
                 .sorted(Comparator.comparingDouble((PostResponse r) -> -score(
-                        r, following.contains(r.author().id()), interests.contains(r.category()), now)))
+                        r, following.contains(r.author().id()), r.categories().stream().anyMatch(interests::contains), now)))
                 .limit(FEED_SIZE)
                 .toList();
     }

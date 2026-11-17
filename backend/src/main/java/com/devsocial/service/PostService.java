@@ -40,7 +40,7 @@ public class PostService {
 
     @Transactional
     public PostResponse create(String username, PostRequest req) {
-        return create(username, req.content(), req.category(), null);
+        return create(username, req.content(), merge(req.category(), req.categories()), null);
     }
 
     /**
@@ -48,10 +48,8 @@ public class PostService {
      * At least one of {@code content} and {@code image} is required.
      */
     @Transactional
-    public PostResponse create(String username, String content, String category, MultipartFile image) {
-        if (category == null || !Categories.ALL.contains(category)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Unknown category: " + category);
-        }
+    public PostResponse create(String username, String content, List<String> categories, MultipartFile image) {
+        List<String> picked = validCategories(categories);
         String text = content == null ? "" : content.trim();
         boolean hasImage = image != null && !image.isEmpty();
         if (text.isEmpty() && !hasImage) {
@@ -66,10 +64,37 @@ public class PostService {
         Post post = new Post();
         post.setAuthor(author);
         post.setContent(text);
-        post.setCategory(category);
+        post.setCategory(picked.get(0));
+        post.setCategories(new ArrayList<>(picked));
         if (hasImage) post.setImageKey(storage.store(image));
         postRepository.save(post);
         return toResponse(post, author);
+    }
+
+    /** The single {@code category} (older clients) plus the {@code categories} list, in order. */
+    public static List<String> merge(String category, List<String> categories) {
+        List<String> all = new ArrayList<>();
+        if (category != null && !category.isBlank()) all.add(category);
+        if (categories != null) all.addAll(categories);
+        return all;
+    }
+
+    /** One to three known categories, trimmed and without repeats. */
+    static List<String> validCategories(List<String> categories) {
+        LinkedHashSet<String> picked = new LinkedHashSet<>();
+        if (categories != null) {
+            for (String c : categories) {
+                if (c == null || c.isBlank()) continue;
+                String name = c.strip();
+                if (!Categories.ALL.contains(name)) throw new ApiException(HttpStatus.BAD_REQUEST, "Unknown category: " + name);
+                picked.add(name);
+            }
+        }
+        if (picked.isEmpty()) throw new ApiException(HttpStatus.BAD_REQUEST, "Pick at least one category");
+        if (picked.size() > Categories.MAX_PER_POST) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Pick up to " + Categories.MAX_PER_POST + " categories");
+        }
+        return List.copyOf(picked);
     }
 
     /** A post the viewer may see: its author hasn't blocked them (either way) and isn't suspended. */
@@ -137,7 +162,7 @@ public class PostService {
         Map<Long, Long> comments = toMap(commentRepository.countByPostIds(ids));
         Set<Long> liked = viewer == null ? Set.of() : new HashSet<>(likeRepository.findLikedPostIds(viewer.getId(), ids));
         return posts.stream().map(p -> new PostResponse(
-                p.getId(), p.getContent(), p.getCategory(), signer.sign(MediaStorageService.urlFor(p.getImageKey())),
+                p.getId(), p.getContent(), p.getCategory(), p.allCategories(), signer.sign(MediaStorageService.urlFor(p.getImageKey())),
                 p.getCreatedAt(), userService.author(p.getAuthor()),
                 likes.getOrDefault(p.getId(), 0L), comments.getOrDefault(p.getId(), 0L),
                 liked.contains(p.getId()))).toList();

@@ -17,7 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> recent(@Param("hidden") Collection<Long> hidden, Pageable pageable);
 
     @EntityGraph(attributePaths = "author")
-    @Query("select p from Post p where p.category = :category and p.author.suspended = false and p.author.id not in :hidden order by p.createdAt desc")
+    @Query("select p from Post p where (p.category = :category or :category member of p.categories) and p.author.suspended = false and p.author.id not in :hidden order by p.createdAt desc")
     List<Post> recentInCategory(@Param("category") String category, @Param("hidden") Collection<Long> hidden, Pageable pageable);
 
     @EntityGraph(attributePaths = "author")

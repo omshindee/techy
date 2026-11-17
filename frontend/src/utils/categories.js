@@ -16,6 +16,12 @@ export const CATEGORY_COLORS = {
   Memes: '#f08c00',
 }
 
+/** Keep in sync with Categories.MAX_PER_POST in the backend. */
+export const MAX_CATEGORIES_PER_POST = 3
+
+/** All of a post's categories (older posts only have `category`). */
+export const categoriesOf = (post) => (post.categories?.length ? post.categories : [post.category])
+
 const SHORT = { 'Operating Systems': 'OS', 'Web Development': 'Web' }
 
 export const colorFor = (category) => CATEGORY_COLORS[category] || '#5c6b82'

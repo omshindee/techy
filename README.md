@@ -71,7 +71,7 @@ All routes except `/api/auth/*` and `GET /api/media/*` need `Authorization: Bear
 | GET | `/api/users/{username}` | Profile |
 | POST / DELETE | `/api/users/{username}/follow` · `/block` | Follow / unfollow, block / unblock |
 | GET | `/api/users/{username}/followers` · `/following` | Lists |
-| POST | `/api/posts` | JSON `{ content, category }`, or multipart `content`, `category`, `image` |
+| POST | `/api/posts` | JSON `{ content, categories: [1-3] }`, or multipart `content`, `categories` (repeated), `image` |
 | GET | `/api/posts?category=&username=` | Recent posts, filtered |
 | GET / DELETE | `/api/posts/{id}` | One post / delete (own, or any as moderator) |
 | POST / DELETE | `/api/posts/{id}/like` | Like / unlike |

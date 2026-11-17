@@ -26,21 +26,22 @@ public class PostController {
         return Categories.ALL;
     }
 
-    /** Text-only post as JSON: {@code { content, category }}. */
+    /** Text-only post as JSON: {@code { content, categories: [...] }} (or a single {@code category}). */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public PostResponse create(@Valid @RequestBody PostRequest req, Principal principal) {
         return postService.create(principal.getName(), req);
     }
 
-    /** Post with an optional image as multipart form data: fields content, category, image. */
+    /** Post with an optional image as multipart form data: fields content, categories (repeated) or category, image. */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public PostResponse createWithImage(@RequestParam(required = false) String content,
-                                        @RequestParam String category,
+                                        @RequestParam(required = false) String category,
+                                        @RequestParam(required = false) List<String> categories,
                                         @RequestPart(required = false) MultipartFile image,
                                         Principal principal) {
-        return postService.create(principal.getName(), content, category, image);
+        return postService.create(principal.getName(), content, PostService.merge(category, categories), image);
     }
 
     @GetMapping

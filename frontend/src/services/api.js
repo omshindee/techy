@@ -90,11 +90,11 @@ export const api = {
     const qs = q.toString()
     return request(`/posts${qs ? `?${qs}` : ''}`)
   },
-  /** Text post, photo post, or photo with caption. `image` is an optional File/Blob. */
-  createPost: (content, category, image) => {
+  /** Text post, photo post, or photo with caption. `categories`: 1–3 names; `image` is an optional File/Blob. */
+  createPost: (content, categories, image) => {
     const form = new FormData()
     form.set('content', content)
-    form.set('category', category)
+    for (const c of [].concat(categories)) form.append('categories', c)
     if (image) form.set('image', image, image.name || 'photo.jpg')
     return request('/posts', { method: 'POST', form })
   },

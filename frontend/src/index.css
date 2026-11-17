@@ -152,6 +152,14 @@ img { display: block; }
 .post { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px 14px; }
 .post-head { display: flex; align-items: center; gap: 11px; }
 .post-head > a:first-child { display: inline-flex; }
+.post-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; min-width: 0; max-width: 50%; }
+.tag:disabled { opacity: .45; cursor: not-allowed; }
+/* Phones: tags get their own line under the name so long names and several tags both fit. */
+@media (max-width: 640px) {
+  .post-head { flex-wrap: wrap; row-gap: 6px; }
+  .post-head .icon-button { order: 2; }
+  .post-tags { order: 3; flex-basis: 100%; max-width: none; justify-content: flex-start; padding-left: 51px; }
+}
 .post-meta { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .post-meta time { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
 .post-text { margin-top: 12px; }
