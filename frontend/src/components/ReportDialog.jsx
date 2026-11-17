@@ -12,7 +12,7 @@ const REASONS = [
   ['OTHER', 'Something else', ''],
 ]
 
-const NOUN = { POST: 'post', COMMENT: 'comment', USER: 'account' }
+const NOUN = { POST: 'post', COMMENT: 'comment', USER: 'account', MESSAGE: 'message' }
 
 /** "Report this post / comment / account" form. Reports go to the moderators' queue. */
 export default function ReportDialog({ targetType, targetId, onClose }) {

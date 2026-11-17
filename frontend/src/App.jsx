@@ -7,6 +7,7 @@ import Home from './pages/Home.jsx'
 import Profile from './pages/Profile.jsx'
 import CreatePost from './pages/CreatePost.jsx'
 import People from './pages/People.jsx'
+import Messages from './pages/Messages.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 import Settings from './pages/Settings.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
@@ -38,6 +39,8 @@ export default function App() {
       <Route path="/" element={<Protected><Home /></Protected>} />
       <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
       <Route path="/people" element={<Protected><People /></Protected>} />
+      <Route path="/messages" element={<Protected><Messages /></Protected>} />
+      <Route path="/messages/:username" element={<Protected><Messages /></Protected>} />
       <Route path="/new" element={<Protected><CreatePost /></Protected>} />
       <Route path="/settings" element={<Protected><Settings /></Protected>} />
       <Route path="/moderation" element={<Protected><Moderation /></Protected>} />

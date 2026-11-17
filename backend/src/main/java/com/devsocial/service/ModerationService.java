@@ -32,6 +32,7 @@ public class ModerationService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final com.devsocial.repository.MessageRepository messageRepository;
     private final PostService postService;
     private final ReportService reportService;
     private final UserService userService;
@@ -66,6 +67,7 @@ public class ModerationService {
                 switch (report.getTargetType()) {
                     case POST -> postRepository.findById(report.getTargetId()).ifPresent(postService::remove);
                     case COMMENT -> commentRepository.findById(report.getTargetId()).ifPresent(commentRepository::delete);
+                    case MESSAGE -> messageRepository.findById(report.getTargetId()).ifPresent(messageRepository::delete);
                     case USER -> throw new ApiException(HttpStatus.BAD_REQUEST, "To act on an account, suspend it");
                 }
                 resolution = "Removed " + report.getTargetType().name().toLowerCase();
@@ -137,6 +139,10 @@ public class ModerationService {
                 yield u.map(user -> new ReportTarget(true, userService.author(user), user.getBio(), null, null, user.isSuspended()))
                         .orElse(gone());
             }
+            // Only the reported message is shown to moderators, never the rest of the private conversation.
+            case MESSAGE -> messageRepository.findById(r.getTargetId())
+                    .map(m -> new ReportTarget(true, userService.author(m.getSender()), m.getContent(), null, null, m.getSender().isSuspended()))
+                    .orElse(gone());
         };
     }
 

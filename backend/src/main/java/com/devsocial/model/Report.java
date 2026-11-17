@@ -12,7 +12,7 @@ import java.time.Instant;
 @Table(name = "reports", uniqueConstraints = @UniqueConstraint(columnNames = {"reporter_id", "target_type", "target_id"}))
 @Getter @Setter @NoArgsConstructor
 public class Report {
-    public enum TargetType { POST, COMMENT, USER }
+    public enum TargetType { POST, COMMENT, USER, MESSAGE }
     public enum Reason { SPAM, HARASSMENT, HATE, NUDITY, VIOLENCE, SCAM, OTHER }
     public enum Status { OPEN, RESOLVED, DISMISSED }
 

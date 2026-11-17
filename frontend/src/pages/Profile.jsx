@@ -9,7 +9,7 @@ import UserListModal from '../components/UserListModal.jsx'
 import ReportDialog from '../components/ReportDialog.jsx'
 import { ActionSheet } from '../components/Modal.jsx'
 import { FollowButton } from '../components/UserCard.jsx'
-import { GithubIcon, ListIcon, MoreIcon, PenIcon, PhotoIcon } from '../components/Icons.jsx'
+import { ChatIcon, GithubIcon, ListIcon, MoreIcon, PenIcon, PhotoIcon } from '../components/Icons.jsx'
 import { api, mediaUrl } from '../services/api.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { colorFor } from '../utils/categories.js'
@@ -101,6 +101,10 @@ export default function Profile() {
                   {profile.blockedByMe
                     ? <button className="btn btn-ghost" onClick={unblock}>Unblock</button>
                     : <FollowButton user={profile} onChange={setProfile} />}
+                  {/* You can message people you follow (they can always reply from their inbox). */}
+                  {profile.followedByMe && !profile.blockedByMe && (
+                    <Link to={`/messages/${profile.username}`} className="btn btn-ghost"><ChatIcon size={16} /> Message</Link>
+                  )}
                   <button className="icon-button bordered" onClick={() => setMenu(true)} aria-label="More options"><MoreIcon size={20} /></button>
                 </>
               )}

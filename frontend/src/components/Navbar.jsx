@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import Avatar from './Avatar.jsx'
 import Brand from './Brand.jsx'
-import { GearIcon, HomeIcon, LogOutIcon, PenIcon, SearchIcon, ShieldIcon, UsersIcon } from './Icons.jsx'
+import { ChatIcon, GearIcon, HomeIcon, LogOutIcon, PenIcon, SearchIcon, ShieldIcon, UsersIcon } from './Icons.jsx'
 import { api } from '../services/api.js'
 import { useAuth } from '../context/AuthContext.jsx'
 
@@ -27,8 +27,21 @@ export default function Navbar() {
     return () => { clearInterval(t); window.removeEventListener('techy:reports-changed', load) }
   }, [user.admin])
 
+  // Unread direct messages: refreshed every 30 s, on page changes, and when a chat is read or sent.
+  const [unread, setUnread] = useState(0)
+  const { pathname } = useLocation()
+  useEffect(() => {
+    const load = () => { if (document.visibilityState === 'visible') api.unreadMessages().then((r) => setUnread(r.count)).catch(() => {}) }
+    load()
+    const t = setInterval(load, 30_000)
+    window.addEventListener('techy:messages-changed', load)
+    document.addEventListener('visibilitychange', load)
+    return () => { clearInterval(t); window.removeEventListener('techy:messages-changed', load); document.removeEventListener('visibilitychange', load) }
+  }, [pathname])
+
   const links = [
     { to: '/', label: 'Home', Icon: HomeIcon, end: true },
+    { to: '/messages', label: 'Messages', Icon: ChatIcon, badge: unread },
     { to: '/people', label: 'People', Icon: UsersIcon },
     { to: '/settings', label: 'Settings', Icon: GearIcon },
     ...(user.admin ? [{ to: '/moderation', label: 'Moderation', Icon: ShieldIcon, badge: openReports }] : []),
@@ -42,7 +55,7 @@ export default function Navbar() {
           {links.map(({ to, label, Icon, end, badge }) => (
             <NavLink key={to} to={to} end={end} className="sidenav-link" title={label}>
               <Icon size={22} /><span>{label}</span>
-              {badge > 0 && <em className="count-badge" aria-label={`${badge} open`}>{badge}</em>}
+              {badge > 0 && <em className="count-badge" aria-label={`${badge} new`}>{badge > 99 ? '99+' : badge}</em>}
             </NavLink>
           ))}
           <NavLink to={me} className="sidenav-link" title="Profile">
@@ -73,6 +86,7 @@ export default function Navbar() {
             </Link>
           )}
           <Link to="/people" className="icon-button" aria-label="Search people"><SearchIcon size={20} /></Link>
+          <Link to="/settings" className="icon-button" aria-label="Settings"><GearIcon size={20} /></Link>
         </span>
       </header>
 
@@ -80,8 +94,10 @@ export default function Navbar() {
         <NavLink to="/" end aria-label="Home"><HomeIcon size={22} /></NavLink>
         <NavLink to="/people" aria-label="People"><UsersIcon size={22} /></NavLink>
         <NavLink to="/new" className="tabbar-new" aria-label="New post"><PenIcon size={20} /></NavLink>
+        <NavLink to="/messages" aria-label={unread ? `Messages (${unread} new)` : 'Messages'} className="tabbar-msg">
+          <ChatIcon size={22} />{unread > 0 && <em className="count-badge">{unread > 99 ? '99+' : unread}</em>}
+        </NavLink>
         <NavLink to={me} aria-label="Your profile"><Avatar username={user.username} url={user.avatarUrl} size={26} /></NavLink>
-        <NavLink to="/settings" aria-label="Settings"><GearIcon size={22} /></NavLink>
       </nav>
     </>
   )

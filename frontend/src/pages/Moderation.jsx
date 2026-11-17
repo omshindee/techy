@@ -10,7 +10,7 @@ const REASON = {
   SPAM: 'Spam', HARASSMENT: 'Harassment', HATE: 'Hate speech', NUDITY: 'Nudity / sexual',
   VIOLENCE: 'Violence', SCAM: 'Fraud / impersonation', OTHER: 'Other',
 }
-const KIND = { POST: 'Post', COMMENT: 'Comment', USER: 'Account' }
+const KIND = { POST: 'Post', COMMENT: 'Comment', USER: 'Account', MESSAGE: 'Message' }
 
 function ReportCard({ report, onResolved }) {
   const [busy, setBusy] = useState('')

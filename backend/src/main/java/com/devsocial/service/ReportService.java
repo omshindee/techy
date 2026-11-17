@@ -3,10 +3,12 @@ package com.devsocial.service;
 import com.devsocial.dto.AccountRequests.ReportRequest;
 import com.devsocial.exception.ApiException;
 import com.devsocial.model.Comment;
+import com.devsocial.model.Message;
 import com.devsocial.model.Post;
 import com.devsocial.model.Report;
 import com.devsocial.model.User;
 import com.devsocial.repository.CommentRepository;
+import com.devsocial.repository.MessageRepository;
 import com.devsocial.repository.PostRepository;
 import com.devsocial.repository.ReportRepository;
 import com.devsocial.repository.UserRepository;
@@ -27,6 +29,7 @@ public class ReportService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final MessageRepository messageRepository;
     private final UserService userService;
     private final RateLimiter rateLimiter;
 
@@ -36,6 +39,12 @@ public class ReportService {
         userService.requireVerified(reporter);
         User owner = ownerOf(req.targetType(), req.targetId());
         if (owner.getId().equals(reporter.getId())) throw new ApiException(HttpStatus.BAD_REQUEST, "You can't report your own content");
+        if (req.targetType() == Report.TargetType.MESSAGE) {
+            // Messages are private: only the other person in that conversation can report one.
+            boolean participant = messageRepository.findById(req.targetId())
+                    .map(m -> m.getConversation().includes(reporter)).orElse(false);
+            if (!participant) throw new ApiException(HttpStatus.NOT_FOUND, "Message not found");
+        }
         if (reportRepository.existsByReporterIdAndTargetTypeAndTargetId(reporter.getId(), req.targetType(), req.targetId())) {
             throw new ApiException(HttpStatus.CONFLICT, "You've already reported this. Our moderators will take a look.");
         }
@@ -58,6 +67,8 @@ public class ReportService {
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Comment not found"));
             case USER -> userRepository.findById(id)
                     .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+            case MESSAGE -> messageRepository.findById(id).map(Message::getSender)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Message not found"));
         };
     }
 }

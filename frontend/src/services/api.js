@@ -109,6 +109,19 @@ export const api = {
   report: (targetType, targetId, reason, details) =>
     request('/reports', { method: 'POST', body: { targetType, targetId, reason, details } }),
 
+  // Direct messages
+  inbox: () => request('/messages/conversations'),
+  unreadMessages: () => request('/messages/unread-count'),
+  /** { after } = only newer than that message id (polling); { before } = older page. */
+  thread: (username, { after, before } = {}) => {
+    const q = new URLSearchParams()
+    if (after) q.set('after', after)
+    if (before) q.set('before', before)
+    const qs = q.toString()
+    return request(`/messages/with/${enc(username)}${qs ? `?${qs}` : ''}`)
+  },
+  sendMessage: (username, content) => request(`/messages/with/${enc(username)}`, { method: 'POST', body: { content } }),
+
   // Moderators only
   reports: (status = 'open') => request(`/admin/reports?status=${status}`),
   openReportCount: () => request('/admin/reports/count'),

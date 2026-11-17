@@ -150,3 +150,22 @@ export const ShieldIcon = (p) => (
     <path d="m9 12 2.2 2.2L15.5 10" />
   </Svg>
 )
+
+export const ChatIcon = ({ filled, ...p }) => (
+  <Svg {...p}>
+    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17h0a1.5 1.5 0 0 1-1.5-1.5z" fill={filled ? "currentColor" : "none"} />
+    {!filled && <path d="M8 8.5h8M8 12h5" />}
+  </Svg>
+)
+
+export const SendIcon = (p) => (
+  <Svg {...p}>
+    <path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5z" />
+  </Svg>
+)
+
+export const BackIcon = (p) => (
+  <Svg {...p}>
+    <path d="M15 5l-7 7 7 7" />
+  </Svg>
+)
