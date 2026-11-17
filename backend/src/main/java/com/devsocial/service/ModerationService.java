@@ -37,6 +37,7 @@ public class ModerationService {
     private final ReportService reportService;
     private final UserService userService;
     private final MediaUrlSigner signer;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<ReportResponse> reports(boolean open) {
@@ -66,7 +67,10 @@ public class ModerationService {
             case REMOVE -> {
                 switch (report.getTargetType()) {
                     case POST -> postRepository.findById(report.getTargetId()).ifPresent(postService::remove);
-                    case COMMENT -> commentRepository.findById(report.getTargetId()).ifPresent(commentRepository::delete);
+                    case COMMENT -> commentRepository.findById(report.getTargetId()).ifPresent(c -> {
+                        notificationService.commentDeleted(c.getId());
+                        commentRepository.delete(c);
+                    });
                     case MESSAGE -> messageRepository.findById(report.getTargetId()).ifPresent(messageRepository::delete);
                     case USER -> throw new ApiException(HttpStatus.BAD_REQUEST, "To act on an account, suspend it");
                 }

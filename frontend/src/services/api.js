@@ -98,6 +98,7 @@ export const api = {
     if (image) form.set('image', image, image.name || 'photo.jpg')
     return request('/posts', { method: 'POST', form })
   },
+  post: (id) => request(`/posts/${id}`),
   deletePost: (id) => request(`/posts/${id}`, { method: 'DELETE' }),
   like: (id) => request(`/posts/${id}/like`, { method: 'POST' }),
   unlike: (id) => request(`/posts/${id}/like`, { method: 'DELETE' }),
@@ -108,6 +109,16 @@ export const api = {
   /** targetType: POST | COMMENT | USER; reason: SPAM | HARASSMENT | HATE | NUDITY | VIOLENCE | SCAM | OTHER */
   report: (targetType, targetId, reason, details) =>
     request('/reports', { method: 'POST', body: { targetType, targetId, reason, details } }),
+
+  // Notifications: follows, likes and comments on your posts
+  notifications: (before) => request(`/notifications${before ? `?before=${before}` : ''}`),
+  unreadNotifications: () => request('/notifications/unread-count'),
+  markNotificationsRead: () => request('/notifications/read', { method: 'POST' }),
+
+  // Push notifications on this device
+  pushConfig: () => request('/push/config'),
+  pushSubscribe: (subscription) => request('/push/subscribe', { method: 'POST', body: subscription }),
+  pushUnsubscribe: (endpoint) => request('/push/unsubscribe', { method: 'POST', body: { endpoint } }),
 
   // Direct messages
   inbox: () => request('/messages/conversations'),

@@ -5,6 +5,8 @@ import com.devsocial.model.Block;
 import com.devsocial.model.User;
 import com.devsocial.repository.BlockRepository;
 import com.devsocial.repository.FollowRepository;
+import com.devsocial.repository.NotificationRepository;
+import com.devsocial.model.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class BlockService {
 
     private final BlockRepository blockRepository;
     private final FollowRepository followRepository;
+    private final NotificationRepository notificationRepository;
 
     /** Everyone the viewer blocked plus everyone who blocked the viewer. Never empty. */
     public Set<Long> hiddenIds(User viewer) {
@@ -64,6 +67,8 @@ public class BlockService {
         if (!blocked(blocker, target)) blockRepository.save(new Block(blocker, target));
         followRepository.findByFollowerIdAndFollowingId(blocker.getId(), target.getId()).ifPresent(followRepository::delete);
         followRepository.findByFollowerIdAndFollowingId(target.getId(), blocker.getId()).ifPresent(followRepository::delete);
+        notificationRepository.deleteFollow(blocker.getId(), target.getId(), Notification.Type.FOLLOW);
+        notificationRepository.deleteFollow(target.getId(), blocker.getId(), Notification.Type.FOLLOW);
     }
 
     @Transactional

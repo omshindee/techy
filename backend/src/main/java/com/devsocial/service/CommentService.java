@@ -26,6 +26,7 @@ public class CommentService {
     private final UserService userService;
     private final BlockService blockService;
     private final RateLimiter rateLimiter;
+    private final NotificationService notificationService;
 
     @Transactional
     public CommentResponse add(Long postId, String username, CommentRequest req) {
@@ -39,6 +40,7 @@ public class CommentService {
         comment.setAuthor(author);
         comment.setContent(req.content().trim());
         commentRepository.save(comment);
+        notificationService.commented(author, comment);
         return toResponse(comment);
     }
 
@@ -64,6 +66,7 @@ public class CommentService {
                 || comment.getPost().getAuthor().getId().equals(user.getId())
                 || user.isAdmin();
         if (!allowed) throw new ApiException(HttpStatus.FORBIDDEN, "You can't delete this comment");
+        notificationService.commentDeleted(comment.getId());
         commentRepository.delete(comment);
     }
 

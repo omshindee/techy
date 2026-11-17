@@ -36,6 +36,7 @@ public class PostService {
     private final UserService userService;
     private final BlockService blockService;
     private final RateLimiter rateLimiter;
+    private final NotificationService notificationService;
 
     @Transactional
     public PostResponse create(String username, PostRequest req) {
@@ -117,6 +118,7 @@ public class PostService {
     /** Deletes a post with its likes, comments and photo. */
     @Transactional
     public void remove(Post post) {
+        notificationService.postDeleted(post.getId());
         commentRepository.deleteByPostId(post.getId());
         likeRepository.deleteByPostId(post.getId());
         postRepository.delete(post);

@@ -113,7 +113,7 @@ Photos and profile pictures are stored on disk in `STORAGE_DIR` (default `backen
 | Reporting | Any post, comment or account can be reported with a reason. | Always on. |
 | Moderation | Moderators see a queue (sidebar → Moderation) and can remove content, suspend accounts or dismiss. Suspended users are signed out, can't sign in, and their profile and posts are hidden. | Put your email in `ADMIN_EMAILS`, then confirm it. |
 
-**Email setup.** Any SMTP provider works: Resend, Brevo, Postmark, Mailgun, Amazon SES, or a Gmail app password for testing. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM` and `APP_BASE_URL` (your public URL, used in the links). For good deliverability, send from your own domain with SPF/DKIM set up as the provider explains.
+**Email setup.** Either set `BREVO_API_KEY` (Brevo's HTTPS API, for hosts that block SMTP such as Render's free plan) or use any SMTP provider: Resend, Brevo, Postmark, Mailgun, Amazon SES, or a Gmail app password for testing. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM` and `APP_BASE_URL` (your public URL, used in the links). For good deliverability, send from your own domain with SPF/DKIM set up as the provider explains.
 
 **Without SMTP** (local development), emails aren't sent; they're printed in the backend log instead. Copy the link from:
 ```bash

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { api } from '../services/api.js'
+import { forgetDeviceOnSignOut } from '../services/push.js'
 import { clearAuth, getStoredUser, getToken, setAuth, storeUser } from '../utils/auth.js'
 
 const AuthContext = createContext(null)
@@ -26,7 +27,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = (token, u) => { setAuth(token, u); setUser(u) }
-  const logout = () => { clearAuth(); setUser(null) }
+  const logout = () => { forgetDeviceOnSignOut(); clearAuth(); setUser(null) }
   const updateUser = (u) => { storeUser(u); setUser(u) }
   /** Re-reads your account, e.g. after confirming your email in another tab. */
   const refresh = useCallback(() => {

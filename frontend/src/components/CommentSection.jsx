@@ -110,7 +110,8 @@ export default function CommentSection({ postId, postAuthorId, onAdded, onRemove
         <Avatar username={user.username} url={user.avatarUrl} size={28} />
         <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Write a comment…"
           maxLength={1000} aria-label="Write a comment" enterKeyHint="send" />
-        <button className="btn btn-small" disabled={busy || !text.trim()}>Reply</button>
+        {/* Keep focus in the input so the phone keyboard doesn't close and swallow the tap. */}
+        <button className="btn btn-small" disabled={busy || !text.trim()} onMouseDown={(e) => e.preventDefault()}>Reply</button>
       </form>
       {error && <p className="error small">{error}</p>}
       {menuFor && <ActionSheet onClose={() => setMenuFor(null)} options={optionsFor(menuFor)} />}

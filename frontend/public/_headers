@@ -19,6 +19,8 @@
   Service-Worker-Allowed: /
 /workbox-*.js
   Cache-Control: no-cache
+/push-handler.js
+  Cache-Control: no-cache
 /manifest.webmanifest
   Content-Type: application/manifest+json
   Cache-Control: no-cache

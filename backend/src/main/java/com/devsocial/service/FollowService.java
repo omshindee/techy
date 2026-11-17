@@ -20,6 +20,7 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserService userService;
     private final BlockService blockService;
+    private final NotificationService notificationService;
 
     @Transactional
     public UserResponse follow(String viewerUsername, String targetUsername) {
@@ -32,6 +33,7 @@ public class FollowService {
         blockService.requireNotBlocked(viewer, target, "You can't follow this account");
         if (!followRepository.existsByFollowerIdAndFollowingId(viewer.getId(), target.getId())) {
             followRepository.save(new Follow(viewer, target));
+            notificationService.followed(viewer, target);
         }
         return userService.toResponse(target, viewer);
     }
@@ -42,6 +44,7 @@ public class FollowService {
         User target = userService.getEntity(targetUsername);
         followRepository.findByFollowerIdAndFollowingId(viewer.getId(), target.getId())
                 .ifPresent(followRepository::delete);
+        notificationService.unfollowed(viewer, target);
         return userService.toResponse(target, viewer);
     }
 

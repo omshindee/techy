@@ -35,6 +35,7 @@ public class MessageService {
     private static final int PAGE = 50;
     private static final int INBOX_SIZE = 100;
 
+    private final PushService pushService;
     private final ConversationRepository conversations;
     private final MessageRepository messages;
     private final FollowRepository follows;
@@ -78,6 +79,8 @@ public class MessageService {
         m.setContent(text);
         messages.save(m);
         conversation.setLastMessageAt(m.getCreatedAt());
+        pushService.notify(other, new PushService.Push(me.getNameToShow(), text,
+                "/messages/" + me.getUsername(), "dm-" + me.getUsername(), true));
         return toResponse(m, me);
     }
 

@@ -258,7 +258,9 @@ function Chat({ username }) {
         <form className="chat-compose" onSubmit={send}>
           <textarea ref={input} rows={1} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={onKeyDown}
             placeholder={`Message ${other.displayName}…`} maxLength={2000} aria-label="Write a message" enterKeyHint={coarse ? 'enter' : 'send'} />
-          <button className="btn btn-accent chat-send" disabled={sending || !text.trim()} aria-label="Send">
+          {/* Keeping focus in the text box means the phone keyboard stays open, so one tap sends. */}
+          <button className="btn btn-accent chat-send" disabled={sending || !text.trim()} aria-label="Send"
+            onMouseDown={(e) => e.preventDefault()}>
             <SendIcon size={18} />
           </button>
         </form>

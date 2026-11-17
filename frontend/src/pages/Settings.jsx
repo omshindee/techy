@@ -1,3 +1,4 @@
+import PushToggle from '../components/PushToggle.jsx'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Avatar from '../components/Avatar.jsx'
@@ -95,6 +96,7 @@ export default function Settings() {
         <div className="form">
           <EmailStatus />
           <InstallCard />
+          <PushToggle />
           <BlockedAccounts />
         </div>
       </div>

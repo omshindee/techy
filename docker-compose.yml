@@ -41,6 +41,9 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       MAIL_FROM: ${MAIL_FROM:-Techy <no-reply@localhost>}
+      BREVO_API_KEY: ${BREVO_API_KEY:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       REQUIRE_EMAIL_VERIFICATION: ${REQUIRE_EMAIL_VERIFICATION:-true}
       # Cloudflare Turnstile captcha. Off until both keys are set.
       TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}

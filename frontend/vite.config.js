@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
         // swapping code under someone mid-post; registration happens from React.
         registerType: 'prompt',
         injectRegister: false,
-        includeAssets: ['icons/icon.svg', 'icons/favicon-32.png', 'icons/apple-touch-icon.png'],
+        includeAssets: ['icons/favicon-32.png', 'icons/apple-touch-icon.png', 'icons/logo-64.png', 'icons/logo-256.png'],
         manifest: {
           id: '/',
           name: 'Techy',
@@ -45,6 +45,8 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
+          // Push notifications: shows them and opens the right page when tapped (public/push-handler.js).
+          importScripts: ['/push-handler.js'],
           // Precache only the app shell: hashed JS/CSS, index.html, icons. Nothing user-specific.
           globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
           // Deep links (e.g. /profile/priya) open the cached shell; API and health URLs never do.

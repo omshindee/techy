@@ -17,6 +17,7 @@ public class LikeService {
     private final PostService postService;
     private final UserService userService;
     private final BlockService blockService;
+    private final NotificationService notificationService;
 
     @Transactional
     public LikeResponse like(Long postId, String username) {
@@ -26,6 +27,7 @@ public class LikeService {
         blockService.requireNotBlocked(user, post.getAuthor(), "You can't like this post");
         if (likeRepository.findByPostIdAndUserId(postId, user.getId()).isEmpty()) {
             likeRepository.save(new Like(post, user));
+            notificationService.liked(user, post);
         }
         return new LikeResponse(true, likeRepository.countByPostId(postId));
     }
@@ -41,8 +43,9 @@ public class LikeService {
     @Transactional
     public LikeResponse unlike(Long postId, String username) {
         User user = userService.getEntity(username);
-        postService.getVisible(postId, user);
+        Post post = postService.getVisible(postId, user);
         likeRepository.findByPostIdAndUserId(postId, user.getId()).ifPresent(likeRepository::delete);
+        notificationService.unliked(user, post);
         return new LikeResponse(false, likeRepository.countByPostId(postId));
     }
 }

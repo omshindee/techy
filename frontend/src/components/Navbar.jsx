@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import Avatar from './Avatar.jsx'
 import Brand from './Brand.jsx'
-import { ChatIcon, GearIcon, HomeIcon, LogOutIcon, PenIcon, SearchIcon, ShieldIcon, UsersIcon } from './Icons.jsx'
+import { BellIcon, ChatIcon, GearIcon, HomeIcon, LogOutIcon, PenIcon, SearchIcon, ShieldIcon, UsersIcon } from './Icons.jsx'
 import { api } from '../services/api.js'
 import { useAuth } from '../context/AuthContext.jsx'
 
@@ -39,9 +39,21 @@ export default function Navbar() {
     return () => { clearInterval(t); window.removeEventListener('techy:messages-changed', load); document.removeEventListener('visibilitychange', load) }
   }, [pathname])
 
+  // Unread notifications: same rhythm; the Notifications page fires techy:notifications-changed after reading.
+  const [alerts, setAlerts] = useState(0)
+  useEffect(() => {
+    const load = () => { if (document.visibilityState === 'visible') api.unreadNotifications().then((r) => setAlerts(r.count)).catch(() => {}) }
+    load()
+    const t = setInterval(load, 30_000)
+    window.addEventListener('techy:notifications-changed', load)
+    document.addEventListener('visibilitychange', load)
+    return () => { clearInterval(t); window.removeEventListener('techy:notifications-changed', load); document.removeEventListener('visibilitychange', load) }
+  }, [pathname])
+
   const links = [
     { to: '/', label: 'Home', Icon: HomeIcon, end: true },
     { to: '/messages', label: 'Messages', Icon: ChatIcon, badge: unread },
+    { to: '/notifications', label: 'Notifications', Icon: BellIcon, badge: alerts },
     { to: '/people', label: 'People', Icon: UsersIcon },
     { to: '/settings', label: 'Settings', Icon: GearIcon },
     ...(user.admin ? [{ to: '/moderation', label: 'Moderation', Icon: ShieldIcon, badge: openReports }] : []),
@@ -85,6 +97,9 @@ export default function Navbar() {
               <ShieldIcon size={20} />{openReports > 0 && <em className="count-badge">{openReports}</em>}
             </Link>
           )}
+          <Link to="/notifications" className="icon-button" aria-label={alerts ? `Notifications (${alerts} new)` : 'Notifications'}>
+            <BellIcon size={20} />{alerts > 0 && <em className="count-badge">{alerts > 99 ? '99+' : alerts}</em>}
+          </Link>
           <Link to="/people" className="icon-button" aria-label="Search people"><SearchIcon size={20} /></Link>
           <Link to="/settings" className="icon-button" aria-label="Settings"><GearIcon size={20} /></Link>
         </span>

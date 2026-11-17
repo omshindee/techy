@@ -169,3 +169,10 @@ export const BackIcon = (p) => (
     <path d="M15 5l-7 7 7 7" />
   </Svg>
 )
+
+export const BellIcon = ({ filled, ...p }) => (
+  <Svg {...p}>
+    <path d="M6 9.5a6 6 0 0 1 12 0c0 3.6 1 5.6 2 6.8H4c1-1.2 2-3.2 2-6.8z" fill={filled ? "currentColor" : "none"} />
+    <path d="M10 19.5a2.2 2.2 0 0 0 4 0" />
+  </Svg>
+)

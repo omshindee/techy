@@ -152,7 +152,9 @@ What Pages uses from the repo:
 
 ## 6. Email and captcha (production)
 
-- **Email:** set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` and `MAIL_FROM` on the backend. Any provider works (Resend, Brevo, Postmark, Mailgun, SES). Send from your own domain and set up SPF/DKIM as the provider describes, or confirmation emails may land in spam. Until SMTP is set, emails are only printed in the backend log.
+- **Email (Render free plan):** Render blocks outgoing SMTP ports on free instances, so use Brevo's HTTPS API: create a free Brevo account (300 emails/day), verify a sender address under *Senders, Domains & Dedicated IPs → Senders*, create an API key under *SMTP & API → API Keys*, then set `BREVO_API_KEY` and `MAIL_FROM=Techy <the-verified-address>` on the backend. When `BREVO_API_KEY` is set it is used instead of SMTP.
+- **Push notifications** (messages, follows, likes and comments while Techy is closed): set `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` on the backend. Generate the pair once and keep the private key secret; changing it later means everyone has to turn notifications on again. Without the keys, push is simply off. People turn notifications on per device in **Settings → Notifications on this device**. On iPhone/iPad (iOS 16.4+) this only works from the Home Screen app, not in a Safari tab.
+- **Email (SMTP):** set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` and `MAIL_FROM` on the backend. Any provider works (Resend, Brevo, Postmark, Mailgun, SES). Send from your own domain and set up SPF/DKIM as the provider describes, or confirmation emails may land in spam. Until SMTP is set, emails are only printed in the backend log.
 - **Captcha:** Cloudflare → **Turnstile → Add widget**. Hostnames: your `pages.dev` domain and your custom domain. Put the keys on the backend as `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`. The site's Content-Security-Policy already allows Turnstile.
 
 ## 7. Custom domain (optional)
@@ -184,7 +186,7 @@ What Pages uses from the repo:
 | Backend won't start: `STORAGE_TYPE=s3 needs S3_ENDPOINT…` | Fill in all `S3_*` variables |
 | Database connection errors | Check `DB_URL` starts with `jdbc:postgresql://` and has `?sslmode=require` |
 | Photos disappear after a redeploy | `STORAGE_TYPE` is `local` on a host without a persistent disk; switch to R2 |
-| Confirmation emails never arrive | SMTP not set (look for "was NOT sent" in the backend log), or check spam/SPF/DKIM |
+| Confirmation emails never arrive | Email not set up (look for "was NOT sent" in the backend log), "Brevo refused" in the log (sender not verified or wrong key), or check spam/SPF/DKIM |
 | Old version keeps showing | Normal for a few seconds; the app offers **Update**. `_headers` makes `sw.js` uncacheable, so it always finds new versions |
 
 ## Alternative: calling the backend directly (no proxy)

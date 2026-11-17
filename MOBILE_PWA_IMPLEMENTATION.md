@@ -49,7 +49,7 @@ Tooling: **vite-plugin-pwa 0.21.2** (Workbox `generateSW`) and **workbox-window 
 | `icons` | 192 and 512 PNG (`any`), 192 and 512 PNG (`maskable`) |
 | `shortcuts` | New post (`/new`), People (`/people`) |
 
-**Icons** (`public/icons/`) come from `scripts/generate-icons.mjs` (`npm run icons`), a dependency-free generator for the `>_` mark. It makes rounded "any" icons, full-bleed maskable icons with the mark inside the 80 % safe zone, an opaque 180×180 `apple-touch-icon.png`, a 32 px favicon and `icon.svg`.
+**Icons** (`public/icons/`) are made from the mascot artwork (the emoji with glasses and a laptop). Home-screen icons keep its dark-blue background: `icon-192/512.png` ("any"), `maskable-192/512.png` (artwork scaled into the 80 % safe zone on matching blue) and an opaque 180×180 `apple-touch-icon.png`. Inside the app the mascot is cut out with no background: `logo-64/256.png` (the logo next to "Techy") and the 32 px `favicon-32.png`.
 
 **Service worker: what is cached**
 - *Precached:* the app shell only, meaning `index.html`, hashed JS/CSS, icons and the manifest (19 entries, about 284 KiB).
