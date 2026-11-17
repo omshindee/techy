@@ -84,7 +84,7 @@ All routes except `/api/auth/*` and `GET /api/media/*` need `Authorization: Bear
 | POST / DELETE | `/api/admin/users/{username}/suspend` | Suspend / lift |
 | GET | `/api/media/{key}?exp=&sig=` | Uploaded image; only signed, unexpired links work |
 
-Categories: C++, Java, DSA, Linux, Operating Systems, Web Development, AI/ML, DevOps (`Categories.java` and `frontend/src/utils/categories.js`).
+Categories: C++, Java, DSA, Linux, Operating Systems, Web Development, AI/ML, DevOps, Tech, Memes (`Categories.java` and `frontend/src/utils/categories.js`).
 
 ## Mobile app (PWA)
 

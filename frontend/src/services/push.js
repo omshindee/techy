@@ -50,7 +50,20 @@ export async function enablePush() {
     await sub.unsubscribe().catch(() => {})
     sub = null
   }
-  sub ??= await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toBytes(key) })
+  if (!sub) {
+    const options = { userVisibleOnly: true, applicationServerKey: toBytes(key) }
+    try {
+      sub = await reg.pushManager.subscribe(options)
+    } catch (first) {
+      // A stale subscription can block a new one: clear it and try once more.
+      await (await reg.pushManager.getSubscription())?.unsubscribe().catch(() => {})
+      try {
+        sub = await reg.pushManager.subscribe(options)
+      } catch {
+        throw new Error(pushServiceHelp(first))
+      }
+    }
+  }
   await api.pushSubscribe(sub.toJSON())
   return 'on'
 }
@@ -93,4 +106,17 @@ export async function refreshSubscription() {
 
 function sameKey(a, b) {
   return a.length === b.length && a.every((x, i) => x === b[i])
+}
+
+/** "Registration failed - push service error" means the browser couldn't reach its push service. */
+function pushServiceHelp(error) {
+  if (navigator.brave) {
+    return 'Brave blocks notifications from websites by default. Open brave://settings/privacy, turn on "Use Google services for push messaging", restart Brave, then try again.'
+  }
+  const ua = navigator.userAgent
+  if (/OPR\/|Vivaldi/.test(ua)) {
+    return 'This browser couldn’t register for notifications. Try Chrome, Edge or Firefox on this computer.'
+  }
+  return `Your browser couldn’t register for notifications (${error?.message || 'push service error'}). ` +
+    'Check that notifications are allowed for this site and that a VPN, firewall or ad blocker isn’t blocking them, then try again; Chrome, Edge and Firefox work.'
 }

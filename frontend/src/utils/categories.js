@@ -1,6 +1,6 @@
 // Keep in sync with backend Categories.java. Each category gets a "syntax highlight" hue.
 export const CATEGORIES = [
-  'C++', 'Java', 'DSA', 'Linux', 'Operating Systems', 'Web Development', 'AI/ML', 'DevOps',
+  'C++', 'Java', 'DSA', 'Linux', 'Operating Systems', 'Web Development', 'AI/ML', 'DevOps', 'Tech', 'Memes',
 ]
 
 export const CATEGORY_COLORS = {
@@ -12,6 +12,8 @@ export const CATEGORY_COLORS = {
   'Web Development': '#c2255c',
   'AI/ML': '#e8590c',
   DevOps: '#1971c2',
+  Tech: '#495057',
+  Memes: '#f08c00',
 }
 
 const SHORT = { 'Operating Systems': 'OS', 'Web Development': 'Web' }
