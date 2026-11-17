@@ -30,6 +30,12 @@ public class PushController {
         pushService.subscribe(principal.getName(), req);
     }
 
+    /** Sends a test notification to all of your devices now, and says what each push service answered. */
+    @PostMapping("/test")
+    public java.util.List<PushService.DeviceResult> test(Principal principal) {
+        return pushService.sendTest(principal.getName());
+    }
+
     @PostMapping("/unsubscribe")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unsubscribe(@Valid @RequestBody UnsubscribeRequest req, Principal principal) {

@@ -441,6 +441,7 @@ img { display: block; }
 
 /* Notifications */
 .push-prompt { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 16px; margin-bottom: 14px; }
+.push-results { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
 .push-prompt p { margin: 0; display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 200px; }
 .notif-card { padding: 6px 0 4px; overflow: hidden; }
 .notif-group { font-size: 15px; font-weight: 700; margin: 0; padding: 14px 18px 6px; }

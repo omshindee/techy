@@ -118,6 +118,7 @@ export const api = {
   // Push notifications on this device
   pushConfig: () => request('/push/config'),
   pushSubscribe: (subscription) => request('/push/subscribe', { method: 'POST', body: subscription }),
+  pushTest: () => request('/push/test', { method: 'POST' }),
   pushUnsubscribe: (endpoint) => request('/push/unsubscribe', { method: 'POST', body: { endpoint } }),
 
   // Direct messages

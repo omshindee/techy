@@ -26,7 +26,8 @@ export async function pushState() {
   if (!supported) return isIos() && !isStandalone() ? 'ios-install' : 'unsupported'
   if (Notification.permission === 'denied') return 'denied'
   const [reg, key] = await Promise.all([registration(), serverKey()])
-  if (!reg || !key) return 'unavailable'
+  if (!key) return 'no-server-key'
+  if (!reg) return 'unavailable'
   const sub = await reg.pushManager.getSubscription()
   return sub && Notification.permission === 'granted' ? 'on' : 'off'
 }

@@ -153,25 +153,41 @@ public class PushService {
         }
     }
 
-    private void sendToUser(Long userId, Push push) {
+    /** What happened when sending to one device: the push service's host, HTTP status (0 = no answer) and why. */
+    public record DeviceResult(String service, int status, String detail) {}
+
+    /** Sends a test notification to every device of {@code username} right away and reports each result. */
+    public List<DeviceResult> sendTest(String username) {
+        if (!enabled()) throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "Push notifications aren't set up on this server (VAPID keys missing).");
+        User me = userService.getEntity(username);
+        return sendToUser(me.getId(), new Push("Techy", "Test notification: notifications work on this device.", "/settings", "test", true));
+    }
+
+    private List<DeviceResult> sendToUser(Long userId, Push push) {
         try {
             List<PushSubscription> devices = subscriptions.findByUserId(userId);
-            if (devices.isEmpty()) return;
+            if (devices.isEmpty()) return List.of();
             Map<String, Object> payload = new LinkedHashMap<>();
             payload.put("title", push.title());
             payload.put("body", trim(push.body()));
             payload.put("url", push.url());
             payload.put("tag", push.tag());
             byte[] plaintext = json.writeValueAsString(payload).getBytes(StandardCharsets.UTF_8);
-            for (PushSubscription d : devices) sendToDevice(d, plaintext, push.urgent());
+            List<DeviceResult> results = new java.util.ArrayList<>();
+            for (PushSubscription d : devices) results.add(sendToDevice(d, plaintext, push.urgent()));
+            log.info("Push '{}' to user {}: {}", push.tag(), userId, results);
+            return results;
         } catch (Exception e) {
             log.warn("Push to user {} failed: {}", userId, e.toString());
+            return List.of(new DeviceResult("", 0, e.toString()));
         }
     }
 
-    private void sendToDevice(PushSubscription device, byte[] plaintext, boolean urgent) {
+    private DeviceResult sendToDevice(PushSubscription device, byte[] plaintext, boolean urgent) {
+        String host = "";
         try {
             URI endpoint = URI.create(device.getEndpoint());
+            host = endpoint.getHost();
             byte[] body = WebPushCrypto.encrypt(plaintext, WebPushCrypto.b64(device.getP256dh()), WebPushCrypto.b64(device.getAuth()));
             HttpRequest req = HttpRequest.newBuilder(endpoint)
                     .timeout(Duration.ofSeconds(20))
@@ -184,15 +200,20 @@ public class PushService {
                     .build();
             HttpResponse<String> res = http.send(req, HttpResponse.BodyHandlers.ofString());
             int status = res.statusCode();
+            String detail = res.body() == null ? "" : res.body().strip();
+            if (detail.length() > 300) detail = detail.substring(0, 300);
             if (status == 404 || status == 410) {
                 subscriptions.deleteByEndpoint(device.getEndpoint()); // expired or unsubscribed
             } else if (status / 100 != 2) {
-                log.warn("Push service {} answered HTTP {}: {}", endpoint.getHost(), status, res.body());
+                log.warn("Push service {} answered HTTP {}: {}", host, status, detail);
             }
+            return new DeviceResult(host, status, detail);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return new DeviceResult(host, 0, "interrupted");
         } catch (Exception e) {
             log.warn("Push to a device failed: {}", e.toString());
+            return new DeviceResult(host, 0, e.toString());
         }
     }
 
